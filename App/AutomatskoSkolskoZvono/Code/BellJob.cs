@@ -1,9 +1,9 @@
 using System.IO.Ports;
 using Quartz;
 
-namespace AutomatskoSkolskoZvono
+namespace AutomatskoSkolskoZvono.Code
 {
-    public class Zvono : IJob
+    public class BellJob : IJob
     {
         public static SerialPort Port { private get; set; }
 
