@@ -10,7 +10,6 @@ namespace AutomatskoSkolskoZvono
         public void Execute(IJobExecutionContext context)
         {
             Port.WriteLine("1");
-            //MessageBox.Show(context.FireTimeUtc.ToString());
         }
     }
 }
