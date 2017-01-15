@@ -63,7 +63,7 @@
             this.txtPrviPocetak = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.fajlToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripTextBox1 = new System.Windows.Forms.ToolStripTextBox();
+            this.CommunicationPortToolStripTextBox = new System.Windows.Forms.ToolStripTextBox();
             this.napustiProgramToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.rasporedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.normalanToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -427,16 +427,16 @@
             // fajlToolStripMenuItem
             // 
             this.fajlToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripTextBox1,
+            this.CommunicationPortToolStripTextBox,
             this.napustiProgramToolStripMenuItem});
             this.fajlToolStripMenuItem.Name = "fajlToolStripMenuItem";
             this.fajlToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fajlToolStripMenuItem.Text = "Fajl";
             // 
-            // toolStripTextBox1
+            // CommunicationPortToolStripTextBox
             // 
-            this.toolStripTextBox1.Name = "toolStripTextBox1";
-            this.toolStripTextBox1.Size = new System.Drawing.Size(100, 23);
+            this.CommunicationPortToolStripTextBox.Name = "CommunicationPortToolStripTextBox";
+            this.CommunicationPortToolStripTextBox.Size = new System.Drawing.Size(100, 23);
             // 
             // napustiProgramToolStripMenuItem
             // 
@@ -637,7 +637,7 @@
         private System.Windows.Forms.TextBox txtPrviPocetak;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ToolStripMenuItem fajlToolStripMenuItem;
-        private System.Windows.Forms.ToolStripTextBox toolStripTextBox1;
+        private System.Windows.Forms.ToolStripTextBox CommunicationPortToolStripTextBox;
         private System.Windows.Forms.ToolStripMenuItem napustiProgramToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem rasporedToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem normalanToolStripMenuItem;

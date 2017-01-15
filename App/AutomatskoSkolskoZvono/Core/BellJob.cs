@@ -1,7 +1,7 @@
 using System.IO.Ports;
 using Quartz;
 
-namespace AutomatskoSkolskoZvono.Code
+namespace AutomatskoSkolskoZvono.Core
 {
     public class BellJob : IJob
     {

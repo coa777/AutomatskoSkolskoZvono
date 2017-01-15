@@ -1,7 +1,8 @@
-namespace AutomatskoSkolskoZvono.Code
+namespace AutomatskoSkolskoZvono.Core
 {
     public class RingTimes
     {
+        public string RingTimesSchedule { get; set; }
         public string Entrance { get; set; }
         public string FirstClassStart { get; set; }
         public string FirstClassEnd { get; set; }

@@ -1,58 +1,99 @@
 ﻿using System;
-using System.IO.Ports;
 using System.Windows.Forms;
-using AutomatskoSkolskoZvono.Code;
-using Quartz;
-using Quartz.Impl;
+using AutomatskoSkolskoZvono.Core;
 
 namespace AutomatskoSkolskoZvono
 {
     public partial class Form1 : Form
     {
-        public Form1()
+        private readonly BellHandler _bellHandler;
+
+        public Form1(BellHandler bellHandler)
         {
+            _bellHandler = bellHandler;
             InitializeComponent();
         }
 
         private void pokreniButton_Click(object sender, EventArgs e)
         {
-            //if (_myPort.IsOpen == false)
-            //{
-            //    try
-            //    {
-            //        InitSerial(toolStripTextBox1.Text);
-            //        if (_myPort.IsOpen)
-            //        {
-            //            PokreniZaustavi();
-            //            pokreniButton.Enabled = false;
-            //            btnZaustavi.Enabled = true;
-            //        }
-            //    }
-            //    catch (Exception ex)
-            //    {
+            var ringTimes = GetRingTimesFromScreen();
+            _bellHandler.Start(CommunicationPortToolStripTextBox.Text, ringTimes);
 
-            //        MessageBox.Show(ex.Message, @"Greska pri pokretanju serijske komunikacije!");
-            //    }
-            //}
-            //else
-            //{
-            //    PokreniZaustavi();
-            //    pokreniButton.Enabled = false;
-            //    btnZaustavi.Enabled = true;
-            //}
-        }
-
-        private void btnZaustavi_Click(object sender, EventArgs e)
-        {
-            ////myPort.Close();
-            //_sched.Standby();
-            ////sched.Shutdown(true);
-
-            //pokreniButton.Enabled = true;
-            //btnZaustavi.Enabled = false;
+            pokreniButton.Enabled = false;
+            btnZaustavi.Enabled = true;
         }
 
         
+
+        private void btnZaustavi_Click(object sender, EventArgs e)
+        {
+            _bellHandler.Pause();
+
+            pokreniButton.Enabled = true;
+            btnZaustavi.Enabled = false;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            CommunicationPortToolStripTextBox.Text = Properties.Settings.Default.Port;
+
+
+            _bellHandler.InitSerial(CommunicationPortToolStripTextBox.Text);
+            normalanToolStripMenuItem.PerformClick();
+
+            if (_bellHandler.MyPort.IsOpen)
+            {
+                pokreniButton.PerformClick();
+            }
+            else
+            {
+                btnZaustavi.Enabled = false;
+            }
+            BellJob.Port = _bellHandler.MyPort;
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Properties.Settings.Default.Port = CommunicationPortToolStripTextBox.Text;
+            Properties.Settings.Default.Save();
+
+            _bellHandler.Stop();
+        }
+
+        private void normalanToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Blokiraj(false);
+            var ringTimes = _bellHandler.Get45MinRingTimes();
+
+            SetRingTimes(ringTimes);
+        }
+
+        private void skraceniCasoviToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Blokiraj(false);
+            var ringTimes = _bellHandler.Get35MinRingTimes();
+
+            SetRingTimes(ringTimes);
+        }
+
+        private void casovi30MinToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Blokiraj(false);
+            var ringTimes = _bellHandler.Get30MinRingTimes();
+
+            SetRingTimes(ringTimes);
+        }
+
+        private void manuelniToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Blokiraj(true);
+            lblCasovi.Text = @"Manuelni raspored"; //TODO: Add write of custom schedule, xml vs json
+        }
+
+        private void napustiProgramToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
 
         private void Blokiraj(bool p)
         {
@@ -72,127 +113,45 @@ namespace AutomatskoSkolskoZvono
             txtSestiKraj.Enabled = p;
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private RingTimes GetRingTimesFromScreen()
         {
-            //toolStripTextBox1.Text = Properties.Settings.Default.Port;
-            //InitSerial(toolStripTextBox1.Text);
-            //normalanToolStripMenuItem.PerformClick();
-
-            //if (_myPort.IsOpen)
-            //{
-            //    pokreniButton.PerformClick();
-            //}
-            //else
-            //{
-            //    btnZaustavi.Enabled = false;
-            //}
-            //BellJob.Port = _myPort;
+            return new RingTimes
+            {
+                RingTimesSchedule = lblCasovi.Text,
+                Entrance = txtUlazak.Text,
+                FirstClassStart = txtPrviPocetak.Text,
+                FirstClassEnd = txtPrviKraj.Text,
+                SecondClassStart = txtDrugiPocetak.Text,
+                SecondClassEnd = txtDrugiKraj.Text,
+                LargeBreak = txtVelikiOdmor.Text,
+                ThirdClassStart = txtTreciPocetak.Text,
+                ThirdClassEnd = txtTreciKraj.Text,
+                FourthClassStart = txtCetvrtiPocetak.Text,
+                FourthClassEnd = txtCetvrtiKraj.Text,
+                FifthClassStart = txtPetiPocetak.Text,
+                FifthClassEnd = txtPetiKraj.Text,
+                SixthClassStart = txtSestiPocetak.Text,
+                SixthClassEnd = txtSestiKraj.Text
+            };
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        private void SetRingTimes(RingTimes ringTimes)
         {
-            //Properties.Settings.Default.Port = toolStripTextBox1.Text;
-            //Properties.Settings.Default.Save();
-
-            //if (!_myPort.IsOpen) return;
-
-            //_sched?.Shutdown();
-            //_myPort.Close();
-        }
-
-        private void normalanToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Blokiraj(false);
-            lblCasovi.Text = @"Casovi 45 min";
-
-            txtUlazak.Text = @"7:55";
-
-            txtPrviPocetak.Text = @"8:00";
-            txtPrviKraj.Text = @"8:45";
-
-            txtDrugiPocetak.Text = @"8:50";
-            txtDrugiKraj.Text = @"9:35";
-
-            txtVelikiOdmor.Text = @"9:50";
-
-            txtTreciPocetak.Text = @"9:55";
-            txtTreciKraj.Text = @"10:40";
-
-            txtCetvrtiPocetak.Text = @"10:50";
-            txtCetvrtiKraj.Text = @"11:35";
-
-            txtPetiPocetak.Text = @"11:40";
-            txtPetiKraj.Text = @"12:25";
-
-            txtSestiPocetak.Text = @"12:30";
-            txtSestiKraj.Text = @"13:15";
-        }
-
-        private void skraceniCasoviToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Blokiraj(false);
-            lblCasovi.Text = @"Casovi 35 min";
-
-            txtUlazak.Text = @"7:55";
-
-            txtPrviPocetak.Text = @"8:00";
-            txtPrviKraj.Text = @"8:35";
-
-            txtDrugiPocetak.Text = @"8:40";
-            txtDrugiKraj.Text = @"9:15";
-
-            txtVelikiOdmor.Text = @"9:30";
-
-            txtTreciPocetak.Text = @"9:35";
-            txtTreciKraj.Text = @"10:10";
-
-            txtCetvrtiPocetak.Text = @"10:20";
-            txtCetvrtiKraj.Text = @"10:55";
-
-            txtPetiPocetak.Text = @"11:00";
-            txtPetiKraj.Text = @"11:35";
-
-            txtSestiPocetak.Text = @"11:40";
-            txtSestiKraj.Text = @"12:15";
-        }
-
-        private void casovi30MinToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Blokiraj(false);
-            lblCasovi.Text = @"Casovi 30 min";
-
-            txtUlazak.Text = @"7:55";
-
-            txtPrviPocetak.Text = @"8:00";
-            txtPrviKraj.Text = @"8:30";
-
-            txtDrugiPocetak.Text = @"8:35";
-            txtDrugiKraj.Text = @"9:05";
-
-            txtVelikiOdmor.Text = @"9:20";
-
-            txtTreciPocetak.Text = @"9:25";
-            txtTreciKraj.Text = @"9:55";
-
-            txtCetvrtiPocetak.Text = @"10:05";
-            txtCetvrtiKraj.Text = @"10:35";
-
-            txtPetiPocetak.Text = @"10:40";
-            txtPetiKraj.Text = @"11:10";
-
-            txtSestiPocetak.Text = @"11:15";
-            txtSestiKraj.Text = @"11:45";
-        }
-
-        private void manuelniToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Blokiraj(true);
-            lblCasovi.Text = @"Manuelni raspored";
-        }
-
-        private void napustiProgramToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
+            lblCasovi.Text = ringTimes.RingTimesSchedule;
+            txtUlazak.Text = ringTimes.Entrance;
+            txtPrviPocetak.Text = ringTimes.FirstClassStart;
+            txtPrviKraj.Text = ringTimes.FirstClassEnd;
+            txtDrugiPocetak.Text = ringTimes.SecondClassStart;
+            txtDrugiKraj.Text = ringTimes.SecondClassEnd;
+            txtVelikiOdmor.Text = ringTimes.LargeBreak;
+            txtTreciPocetak.Text = ringTimes.ThirdClassStart;
+            txtTreciKraj.Text = ringTimes.ThirdClassEnd;
+            txtCetvrtiPocetak.Text = ringTimes.FourthClassStart;
+            txtCetvrtiKraj.Text = ringTimes.FourthClassEnd;
+            txtPetiPocetak.Text = ringTimes.FifthClassStart;
+            txtPetiKraj.Text = ringTimes.FifthClassEnd;
+            txtSestiPocetak.Text = ringTimes.SixthClassStart;
+            txtSestiKraj.Text = ringTimes.SixthClassEnd;
         }
     }
 }

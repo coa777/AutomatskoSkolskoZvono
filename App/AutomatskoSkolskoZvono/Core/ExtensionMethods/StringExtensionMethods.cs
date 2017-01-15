@@ -1,4 +1,4 @@
-﻿namespace AutomatskoSkolskoZvono.Code.ExtensionMethods
+﻿namespace AutomatskoSkolskoZvono.Core.ExtensionMethods
 {
     public static class StringExtensionMethods
     {
